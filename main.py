@@ -1,6 +1,5 @@
 import requests
 import csv
-username = 'naxalov'
 
 def get_wpm_accuracy(username:str,time:int)->dict:
     url = f'https://api.monkeytype.com/users/{username}/profile'
