@@ -37,10 +37,19 @@ def get_user_info(file_path:str)->dict:
     return users
     
 def get_users_wpm_accuracy(users:dict,time:int)->dict:
-    users_wpm_accuracy = {}
+    users_wpm_accuracy = []
+
     for user in users:
-        users_wpm_accuracy[user['username']] = get_wpm_accuracy(user['username'],time)
-    return users_wpm_accuracy
+        data = get_wpm_accuracy(user['username'],time)
+        users_wpm_accuracy.append(
+            {
+                'full_name': user['full_name'],
+                'username': user['username'],
+                'wpm': data['wpm'],
+                'accuracy': data['accuracy']
+            }
+        )
+    return sorted(users_wpm_accuracy, key=lambda x: x['wpm'], reverse=True)
 
 
 
