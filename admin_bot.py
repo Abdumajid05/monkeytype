@@ -1,7 +1,8 @@
 import os
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-from main import get_wpm_accuracy,get_user_info,get_users_wpm_accuracy
+from main import get_wpm_accuracy,get_user_info,get_users_wpm_accuracy, get_users_html_convert
+
 
 async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
@@ -9,12 +10,21 @@ async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Send a message to the group
-    await context.bot.send_message(chat_id=GROUP_CHAT_ID, text="Hello, everyone!")
+
+    await context.bot.send_message(chat_id=GROUP_CHAT_ID, text='Hello!')
+
+async def send_results_to_image(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # Send a message to the group
+    users = get_user_info('monkeytype.csv')
+    users_wpm_accuracy = get_users_wpm_accuracy(users,15)
+    image_path = 'monkeytype_results.jpg'
+    users_total_convert_image = get_users_html_convert(users_wpm_accuracy, image_path)
+    
+    await context.bot.send_photo(chat_id=GROUP_CHAT_ID, photo=image_path)
+
 
 async def send_results(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     users = get_user_info('monkeytype.csv')
-
-
 
     users_wpm_accuracy = get_users_wpm_accuracy(users,15)
     results=''
@@ -31,11 +41,13 @@ async def send_results(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     # Send a message to the group
     await context.bot.send_message(chat_id=GROUP_CHAT_ID, text=results)
 # GROUP chat ID
-GROUP_CHAT_ID =-1002190225722
+GROUP_CHAT_ID =-1001997475412
 TOKEN = os.environ['TOKEN']
 
+
+
 app = ApplicationBuilder().token(TOKEN).build()
-app.add_handler(CommandHandler("sendResults", send_results))
+app.add_handler(CommandHandler("sendResults", send_results_to_image))
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("hello", hello))
 
