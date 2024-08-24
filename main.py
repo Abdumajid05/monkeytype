@@ -8,11 +8,17 @@ def get_wpm_accuracy(username:str,time:int)->dict:
     # Get the JSON data from the response
     data = response.json()
  
-    time = data['data']['personalBests']['time'][str(time)][0]
+    time = data['data']['personalBests']['time'].get(str(time),0)
+    # Get time
+    
+    # time = time.get(str(time),0)
+    
+    if time == 0:
+        return {'wpm':0,'accuracy':0}
     # Get accuracy
-    accuracy = time['acc']
+    accuracy = time[0].get('acc')
     # Get wpm
-    wpm = time['wpm']
+    wpm = time[0].get('wpm')
     return {'wpm':wpm,'accuracy':accuracy}
     
 # Read users info from csv file
@@ -37,7 +43,12 @@ def get_users_wpm_accuracy(users:dict,time:int)->dict:
         users_wpm_accuracy[user['username']] = get_wpm_accuracy(user['username'],time)
     return users_wpm_accuracy
 
+
+
 users = get_user_info('monkeytype.csv')
+
+
+
 users_wpm_accuracy = get_users_wpm_accuracy(users,15)
 print(users_wpm_accuracy)
 # print(get_wpm_accuracy(username,15))
