@@ -19,7 +19,15 @@ async def send_results(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     users_wpm_accuracy = get_users_wpm_accuracy(users,15)
     results=''
     for idx,user in enumerate(users_wpm_accuracy):
-        results+=f'{idx+1}. {user["full_name"]}\t WPM: {user["wpm"]} Accuracy: {user["accuracy"]}\n'
+        if idx==0:
+            results+=f'🥇 {user["full_name"]}\t WPM: {user["wpm"]} Accuracy: {user["accuracy"]}\n'
+        elif idx==1:
+            results+=f'🥈 {user["full_name"]}\t WPM: {user["wpm"]} Accuracy: {user["accuracy"]}\n'
+        elif idx==2:
+            results+=f'🥉 {user["full_name"]}\t WPM: {user["wpm"]} Accuracy: {user["accuracy"]}\n'
+        else:
+            results+=f'{idx+1}. {user["full_name"]}\t WPM: {user["wpm"]} Accuracy: {user["accuracy"]}\n'
+        
     # Send a message to the group
     await context.bot.send_message(chat_id=GROUP_CHAT_ID, text=results)
 # GROUP chat ID
