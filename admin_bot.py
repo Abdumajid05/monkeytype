@@ -2,7 +2,6 @@ import os
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from main import get_wpm_accuracy,get_user_info,get_users_wpm_accuracy
-from prettytable import PrettyTable
 
 async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
@@ -10,12 +9,21 @@ async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Send a message to the group
-    await context.bot.send_message(chat_id=GROUP_CHAT_ID, text="Hello, everyone!")
+
+    await context.bot.send_message(chat_id=GROUP_CHAT_ID, text='Hello!')
+
+async def send_results_to_image(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # Send a message to the group
+    users = get_user_info('monkeytype.csv')
+    users_wpm_accuracy = get_users_wpm_accuracy(users,15)
+    image_path = 'monkeytype_results.jpg'
+    users_total_convert_image = get_users_html_convert(users_wpm_accuracy, image_path)
+    
+    await context.bot.send_photo(chat_id=GROUP_CHAT_ID, photo=image_path)
+
 
 async def send_results(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     users = get_user_info('monkeytype.csv')
-
-
 
     users_wpm_accuracy = get_users_wpm_accuracy(users,15)
     results=''
@@ -34,21 +42,9 @@ async def send_results(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 # GROUP chat ID
 GROUP_CHAT_ID =-4503928327
 TOKEN = os.environ['TOKEN']
-#pretty table for displaying results
-table = PrettyTable()
-table.field_names = ['full_name', 'wpm', 'accuracy']
-table.add_rows=[]
-for i in get_users_wpm_accuracy(get_user_info('monkeytype.csv'),15):
-    table.add_row([i['full_name'], i['wpm'], i['accuracy']])
-#send table to group
-async def send_table(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-#     # Send a message to the group
-    await context.bot.send_message(chat_id=GROUP_CHAT_ID, text=table)
-print(table)
-#html image to python code
 
 app = ApplicationBuilder().token(TOKEN).build()
-app.add_handler(CommandHandler("sendResults", send_results))
+app.add_handler(CommandHandler("sendResults", send_results_to_image))
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("hello", hello))
 
